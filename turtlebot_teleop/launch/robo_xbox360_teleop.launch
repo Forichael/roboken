@@ -1,0 +1,25 @@
+<launch>
+  <!--
+    Push the left frontal button labeled as 'LB' to activate cmd_vel publishing.
+    Move the left stick around to control the velocity.
+   -->
+  <!--  smooths inputs from cmd_vel_mux/input/teleop_raw to cmd_vel_mux/input/teleop -->
+  <!--  实际上这个有也可以，没有也可以！-->
+  <!-- 这个实际上就是把平滑启动那个节点remap一下，然后这个东西吧，在bringup里面启动了的，所以不用启动了 -->
+  <!--include file="$(find turtlebot_teleop)/launch/includes/velocity_smoother.launch.xml"/-->
+
+  <node pkg="turtlebot_teleop" type="turtlebot_teleop_joy" name="turtlebot_teleop_joystick" output="screen">
+    <param name="scale_angular" value="1.5"/>
+    <param name="scale_linear" value="0.5"/>
+	<!--Xbox使能功能键位置为5-->
+    <param name="axis_deadman" value="5"/>
+    <param name="axis_linear" value="1"/>
+    <param name="axis_angular" value="0"/>
+    <remap from="turtlebot_teleop_joystick/cmd_vel" to="cmd_vel"/>
+  </node>
+
+  <node pkg="joy" type="joy_node" name="joystick">
+	<param name="dev" type="string" value="/dev/input/js0" />  
+  </node>
+
+</launch>

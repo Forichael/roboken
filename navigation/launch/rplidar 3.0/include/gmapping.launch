@@ -1,0 +1,69 @@
+<!-- gmapping的参数很多，详细的你可以取看我上面给的官方链接，我只讲述一下我觉得比较重要的几个参数。  -->
+
+<!-- 1. particles (int, default: 30) 这个参数决定gmapping算法中的粒子数，因为gmapping使用的是粒子滤波算法，粒子在不断地迭代更新， -->
+	<!-- 所以选取一个合适的粒子数可以让算法在保证比较准确的同时有较高的速度。  -->
+
+<!-- 2. minimumScore (float, default: 0.0) 最小匹配得分，这个参数很重要， -->
+	<!-- 它决定了你对激光的一个置信度，越高说明你对激光匹配算法的要求越高， -->
+	<!-- 激光的匹配也越容易失败而转去使用里程计数据，而设的太低又会使地图中出现大量噪声，所以需要大家好好调整。 -->
+
+
+
+<launch>
+  <arg name="scan_topic"  default="scan" />
+  <arg name="base_frame"  default="base_footprint"/>
+<!--
+  <arg name="odom_frame"  default="odom"/>
+-->
+  <arg name="odom_frame"  default="odom_combined"/>
+
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="$(arg base_frame)"/>
+    <param name="odom_frame" value="$(arg odom_frame)"/>
+	
+    <param name="map_update_interval" value="0.01"/><!--//地图更新的一个间隔，两次scanmatch的间隔，地图更新也受scanmach的影响，如果scanmatch没有成功的话，是不会更新地图的  -->
+	
+    <param name="maxUrange" value="4.0"/><!--//set maxUrange < maximum range of the real sensor <= maxRange  -->
+    <param name="maxRange" value="5.0"/>
+	
+    <param name="sigma" value="0.05"/>
+    <param name="kernelSize" value="3"/>
+    <param name="lstep" value="0.05"/><!--optimize机器人移动的初始值（距离）  -->
+    <param name="astep" value="0.05"/><!--//optimize机器人移动的初始值（角度）  -->
+    <param name="iterations" value="5"/><!--//icp的迭代次数  -->
+    <param name="lsigma" value="0.075"/>
+    <param name="ogain" value="3.0"/>
+    <param name="lskip" value="0"/>
+	
+    <param name="minimumScore" value="30"/> <!--最小匹配得分，得分这个好像有200的设定-->
+	
+    <param name="srr" value="0.01"/>
+    <param name="srt" value="0.02"/>
+    <param name="str" value="0.01"/>
+    <param name="stt" value="0.02"/>
+    <param name="linearUpdate" value="0.05"/><!--//机器人移动linearUpdate距离，进行scanmatch  -->
+    <param name="angularUpdate" value="0.0436"/><!--机器人选装angularUpdate角度，进行scanmatch  -->
+    <param name="temporalUpdate" value="-1.0"/>
+    <param name="resampleThreshold" value="0.5"/>
+	
+    <param name="particles" value="8"/><!--//很重要，粒子个数,默认是30，有的调节到了100  -->
+  <!--
+    <param name="xmin" value="-50.0"/>
+    <param name="ymin" value="-50.0"/>
+    <param name="xmax" value="50.0"/>
+    <param name="ymax" value="50.0"/>
+  make the starting size small for the benefit of the Android client's memory...
+  -->
+    <param name="xmin" value="-1.0"/><!--//map初始化的大小  -->
+    <param name="ymin" value="-1.0"/>
+    <param name="xmax" value="1.0"/>
+    <param name="ymax" value="1.0"/>
+
+    <param name="delta" value="0.05"/>
+    <param name="llsamplerange" value="0.01"/>
+    <param name="llsamplestep" value="0.01"/>
+    <param name="lasamplerange" value="0.005"/>
+    <param name="lasamplestep" value="0.005"/>
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+</launch>

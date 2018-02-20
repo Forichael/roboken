@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="data" default="pointcloud"/>
+	
+	<arg name="teleop_keyboard_enable" default="false"/>
+	<group if="$(arg teleop_keyboard_enable)">
+		<node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>
+	</group>
+
+	<include file="$(find navigation)/launch/kinect/kinect_transform_to_laserscan/$(arg data)_to_laserscan.launch"/><!--point-->
+
+	<include file="$(find navigation)/launch/kinect/move_base.launch"/>
+	<include file="$(find navigation)/launch/kinect/amcl.launch"/>	
+	
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find robot_nav)/maps/$(arg map).yaml"/>
+	
+</launch>

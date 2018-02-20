@@ -1,0 +1,65 @@
+<launch>
+  <!--当设置为true时，AMCL将订阅地图主题，而不是进行服务调用以接收其地图。-->
+  <arg name="use_map_topic"   default="true"/>
+  <arg name="scan_topic"      default="scan"/> 
+  <arg name="initial_pose_x"  default="0.0"/>
+  <arg name="initial_pose_y"  default="0.0"/>
+  <arg name="initial_pose_a"  default="0.0"/>
+<!--
+  <arg name="odom_frame_id"   default="odom"/>
+-->
+  <arg name="odom_frame_id"   default="odom_combined"/>
+  <arg name="base_frame_id"   default="base_footprint"/>
+  <arg name="global_frame_id" default="map"/>
+
+  <node pkg="amcl" type="amcl" name="amcl">
+    <param name="use_map_topic"             value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="omni"/><!--使用哪个模型，“diff”，“omni”，“diff-corrected”或“omni-corrected”-->
+    <param name="odom_alpha5"               value="0.1"/><!--与翻译相关的噪声参数（仅在模型为“omni”时使用）-->
+    <param name="gui_publish_rate"          value="10.0"/><!--发布可视化扫描和路径的最大速率（Hz），禁用-1.0。-->
+	
+    <param name="laser_max_beams"           value="120"/><!--更新过滤器时，使用多少间隔均匀的光束 **可以适当增大该参数**-->
+	
+    <param name="laser_max_range"           value="6.0"/><!--最大激光范围（半径，米），A1雷达最大6米-->
+    <param name="min_particles"             value="500"/><!--最小粒子数-->
+    <param name="max_particles"             value="5000"/><!--最大粒子数-->
+	
+    <param name="kld_err"                   value="0.05"/><!--真实分布和估计分布之间的最大误差。 **可以适当增大该参数**-->
+	
+    <param name="kld_z"                     value="0.99"/><!--（1-p）的上标准正常分位数，其中p是估计的失谐上的误差将小于kld_err的概率。-->
+	
+    <param name="odom_alpha1"               value="0.2"/><!--根据机器人运动的旋转分量指定里程表旋转估计中的预期噪声。0.1-->
+    <param name="odom_alpha2"               value="0.2"/><!--根据机器人运动的平移分量，指定里程表旋转估计中的预期噪声。0.1-->
+    <!-- translation std dev, m -->
+    <param name="odom_alpha3"               value="0.8"/><!--从机器人运动的平移分量中指定odometry的翻译估计中的预期噪声。0.1-->
+    <param name="odom_alpha4"               value="0.2"/><!--根据机器人运动的旋转分量指定odometry的翻译估计中的预期噪声。0.1-->
+	
+    <param name="laser_z_hit"               value="0.5"/><!--模型的z_hit部分的混合重量。 0.9-->
+    <param name="laser_z_short"             value="0.05"/><!--模型的z_short部分的混合重量。-->
+    <param name="laser_z_max"               value="0.05"/><!--模型的z_max部分的混合物重量。-->
+    <param name="laser_z_rand"              value="0.5"/><!--模型的z_rand部分的混合重量。-->
+	
+    <param name="laser_sigma_hit"           value="0.2"/><!--在模型的z_hit部分中使用的高斯模型的标准偏差。-->
+    <param name="laser_lambda_short"        value="0.1"/><!--模型的z_short部分的指数衰减参数。-->
+    <param name="laser_model_type"          value="likelihood_field"/><!--使用哪个模型，beam，likelihood_field或likelihood_field_prob（与likelihood_field相同，但包含beamkip功能，如果已启用）。-->
+    <!-- <param name="laser_model_type" value="beam"/> -->
+    <param name="laser_likelihood_max_dist" value="2.0"/><!--在地图上做障碍物充气的最大距离，用于likelihood_field模型。-->
+    <param name="update_min_d"              value="0.2"/><!--执行过滤器更新之前需要执行平移运动。-->
+    <param name="update_min_a"              value="0.4"/><!--执行过滤器更新之前需要执行旋转运动。0.5-->
+    <param name="odom_frame_id"             value="$(arg odom_frame_id)"/> 
+    <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
+    <param name="global_frame_id"           value="$(arg global_frame_id)"/>
+    <param name="resample_interval"         value="0.5"/><!--重新采样之前所需的过滤器更新数。1-->
+    <!-- Increase tolerance because the computer can get quite busy -->
+	
+    <param name="transform_tolerance"       value="0.1"/><!--将发布的变换后期化的时间，以指示此变换在未来有效。**可以适当增大该参数**-->
+	
+    <param name="recovery_alpha_slow"       value="0.0"/><!--慢平均权重滤波器的指数衰减率，用于决定何时通过添加随机姿态来恢复。良好的值可能为0.001。-->
+    <param name="recovery_alpha_fast"       value="0.0"/><!--快速平均权重滤波器的指数衰减率，用于决定何时通过添加随机姿态来恢复。好的值可能为0.1。-->
+    <!--<param name="initial_pose_x"            value="$(arg initial_pose_x)"/>-->
+    <!--<param name="initial_pose_y"            value="$(arg initial_pose_y)"/>-->
+    <!--<param name="initial_pose_a"            value="$(arg initial_pose_a)"/>-->
+    <remap from="scan"                      to="$(arg scan_topic)"/>
+  </node>
+</launch>

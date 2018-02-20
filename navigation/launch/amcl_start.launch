@@ -1,0 +1,8 @@
+<launch>
+  <!-- Run the map server with a map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find navigation)/maps/mymap.yaml" />
+
+  <!-- Run amcl -->
+  <include file="$(find navigation)/launch/amcl_omni.launch" />
+
+</launch>

@@ -1,0 +1,23 @@
+<launch>
+	<!-- 开启九轴传感器工具包razor_imu_9dof并且发布IMU话题 -->
+  <!-- startup IMU node launch-->
+  <include file="$(find razor_imu_9dof)/launch/razor-pub.launch" />
+
+	<!-- IMU与里程计odom进行融合操作 -->
+    <!-- startup robot_pose_ekf node -->
+    <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" output="screen">
+        <param name="output_frame" value="odom_combined"/>
+        <param name="base_footprint_frame" value="base_footprint"/>
+        <param name="freq" value="20.0"/>
+        <param name="sensor_timeout" value="1.0"/>  
+        <param name="odom_used" value="true"/>
+        <param name="imu_used" value="true"/>
+        <param name="vo_used" value="false"/>
+        <param name="debug" value="false"/>
+        <remap from="imu_data" to="imu" />
+    </node>
+    
+  <!-- 对imu与base_footprint进行一个转换操作，因为我没有URDF模型，因此需要转换，具体嘛，在那个包里面的py文件里面 -->
+  <node pkg="tf" type="static_transform_publisher" name="imu_combined_broadcaster" args="0 0 0 0 0 0 /base_footprint /base_imu_footprint 100" />
+
+</launch>

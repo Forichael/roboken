@@ -1,0 +1,9 @@
+<!--激光雷达gmapping启动文件-->
+<launch>
+	<!-- 雷达驱动文件 -->
+	<include file="$(find navigation)/launch/rplidar/rplidar_ros/rplidar.launch"/>
+	<include file="$(find navigation)/launch/rplidar/include/gmapping.launch"/>
+	<!--include file="$(find navigation)/launch/rplidar/include/amcl.launch"/-->
+	<!--include file="$(find navigation)/launch/rplidar//include/move_base.launch"/-->
+	<include file="$(find navigation)/launch/rplidar//include/tab_move_base.launch"/>
+</launch>
